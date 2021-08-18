@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import MoviesList from './components/MoviesList';
 import './App.css';
 import axios from "axios";
+import MovieList from "./components/MoviesList";
 
 function App() {
 
@@ -13,7 +14,7 @@ function App() {
       setIsLoading(true)
       setMovieError(false);
       try {
-         const {data} = await axios.get("https://swapi.dev/api/film/");
+         const {data} = await axios.get("https://swapi.dev/api/films/");
 
          //perdyti duomenis i mums reikalingus
          console.log(data.results)
@@ -33,6 +34,25 @@ function App() {
       setIsLoading(false);
    }
 
+   //component did mount hook'o atitikmuo
+   useEffect(() => {
+      console.log("useeffect ran");
+      fetchMoviesHandler()
+   }, [])
+
+
+   const showMoviesHandler = () => {
+      if (!isLoading && movies.length > 0) {
+         return <MovieList movies={movies}/>
+      } else if (!isLoading && movies.length === 0 && !movieError) {
+         return <p>No movies at the moment </p>
+      } else if (movieError) {
+         return <p> {movieError} </p>
+      } else if (isLoading) {
+         return <p>Loading ...</p>
+      }
+   }
+
    return (
        <React.Fragment>
           <section>
@@ -42,9 +62,13 @@ function App() {
              </button>
           </section>
           <section>
-             {!isLoading && movies.length > 0 && <MoviesList movies={movies}/>}
-             {!isLoading && movies.length === 0 && <p>No movies at the moment </p>}
-             {isLoading && <p>Loading ...</p>}
+             {showMoviesHandler()}
+             {/*{!isLoading && movies.length > 0 && <MoviesList movies={movies}/>}*/}
+             {/*{!isLoading && movies.length === 0 && !movieError && (*/}
+             {/*    <p>No movies at the moment </p>*/}
+             {/*)}*/}
+             {/*{movieError && <p>{movieError}</p>}*/}
+             {/*{isLoading && <p>Loading ...</p>}*/}
           </section>
        </React.Fragment>
    );
